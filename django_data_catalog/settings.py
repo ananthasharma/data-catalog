@@ -27,9 +27,11 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['192.168.190.133']
 
-solr_host_ip = '192.168.190.133'
-solr_port = 8983
-solr_path = 'data-catalog'
+SOLR_HOST_IP = '192.168.190.133'
+SOLR_PORT = 8983
+SOLR_PATH = 'new_core'
+
+MAPR_HOST = SOLR_HOST_IP
 
 # Application definition
 
@@ -43,7 +45,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'django_data_catalog',
     'django_data_catalog.solr',
-    'django_data_catalog.file_browser',
+    'django_data_catalog.file_browser'
 ]
 
 MIDDLEWARE = [

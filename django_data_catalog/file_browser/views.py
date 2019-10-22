@@ -22,6 +22,8 @@ class ListFiles(APIView):
         content = {}
         try:
             content = browser.list_files(folder,mapr_user, mapr_password, host)
+            if(content == None):
+                content={"error":"folder or file not found"}
         except Exception:
             self.log.debug (f"Found exception while listing files from folder {folder}")
             raise

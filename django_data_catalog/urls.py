@@ -16,9 +16,11 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from django_data_catalog.file_browser import views
+from django_data_catalog.solr import views as solr_views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path("browse/",views.ListFiles.as_view()),
-    path("file_info/",views.GetFileInfo.as_view())
+    path("file_info/",views.GetFileInfo.as_view()),
+    path("solr_job/",solr_views.SolrJob.as_view())
 ]
