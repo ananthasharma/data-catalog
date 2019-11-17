@@ -15,12 +15,15 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from django_data_catalog.file_browser import views
-from django_data_catalog.solr import views as solr_views
+from django_data_catalog.file_browser import views as hdfs_file_browser_views
+from django_data_catalog.file_browser import views as local_file_browser
+
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path("browse/",views.ListFiles.as_view()),
-    path("file_info/",views.GetFileInfo.as_view()),
-    path("solr_job/",solr_views.SolrJob.as_view())
+    path("hdfs/browse/", hdfs_file_browser_views.ListFiles.as_view()),
+    path("hdfs/file_info/", hdfs_file_browser_views.GetFileInfo.as_view()),
+    path("local/list/", hdfs_file_browser_views.LocalFileFromCommandLine.as_view()),
+    path("local/download/", hdfs_file_browser_views.LocalFilesystemContentDownloadView.as_view()),
+    
 ]

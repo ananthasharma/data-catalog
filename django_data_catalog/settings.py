@@ -25,13 +25,11 @@ SECRET_KEY = 'kqfs$-+z0j495pl2$$o0zv2(r)otp9i47ruqwl(!kb^i9csb*o'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['192.168.190.133']
+ALLOWED_HOSTS = ['*']
 
-SOLR_HOST_IP = '192.168.190.133'
-SOLR_PORT = 8983
-SOLR_PATH = 'new_core'
-
-MAPR_HOST = SOLR_HOST_IP
+solr_host_ip = '192.168.190.133'
+solr_port = 8983
+solr_path = 'data-catalog'
 
 # Application definition
 
@@ -45,7 +43,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'django_data_catalog',
     'django_data_catalog.solr',
-    'django_data_catalog.file_browser'
+    'django_data_catalog.file_browser',
 ]
 
 MIDDLEWARE = [
