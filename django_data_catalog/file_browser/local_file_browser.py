@@ -24,21 +24,24 @@ class LocalFSBrowser:
 
     def list_folders(self, folder_path):
  #       self.log.debug(f"Listing contents of local folder :{folder_path}")
-        output = {}
+        output = []
         folders = []
         files = []
-        if not os._exists(folder_path):
- #           self.log.info(f"Path {folder_path} doesn't exists")
-            output = {"error":f"Path {folder_path} doesn't exist"}
+        if not os.path.exists(folder_path):
+            output.append({"name":f"{folder_path}","contents":[{"error": "opening dir"}]})
             print("folder not found")
             return output
-        for entry in os.listdir(folder_path):
+        for entry in os.listdir(path=folder_path):
+            entry = folder_path+"/"+entry
             if path.isdir(entry):
                 # this is a folder
-                folders.append(entry)
+                folders.append({"type":"directory", "name":entry, "contents": []})
             if path.isfile(folder_path):
                 # this is a file
-                files.append(entry)
-        #output.append({"name":folder_path})
+                files.append({"type":"file","name":entry})
+        self.log.debug(f"found {len(folders)} folder and {len(files)} files")
+        folders.extend(files)
+        output.append({"type":"directory", "name":folder_path, "contents":folders})
+        return output
 
 LocalFSBrowser().list_folders("/")

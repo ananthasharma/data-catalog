@@ -24,6 +24,16 @@ class LocalFileFromCommandLine(APIView):
         content = fs_browser.list_using_tree(folder)
         return Response(data=content)
 
+class LocalFileFromService(APIView):
+    log = CustomLogger().logger
+    def get(self, request):
+        """ Prints files/folders from local disk """
+        folder = request.GET.get("folder",'/')
+        self.log.debug(f"printing files/folders from root {folder}")
+        fs_browser = LocalFSBrowser()
+        content = fs_browser.list_folders(folder)
+        return Response(data=content)
+
 class LocalFilesystemContentDownloadView(APIView):    
     log = CustomLogger().logger
     def get(self, request):
@@ -53,7 +63,7 @@ class LocalFilesystemContentDownloadView(APIView):
         return response
 
 
-class ListFiles(APIView):
+class ListHDFSFiles(APIView):
     log = CustomLogger().logger
     def get(self, request, mapr_user="mapr", mapr_password=None):
 #        host = request.GET.__getitem__("host")
@@ -71,7 +81,7 @@ class ListFiles(APIView):
         return Response(content)
 
 
-class GetFileInfo(APIView):
+class GetHDFSFileInfo(APIView):
     log = CustomLogger().logger
     def get(self, request,mapr_user="mapr",mapr_password=None):
         file_name = request.GET.get("file_name", None)

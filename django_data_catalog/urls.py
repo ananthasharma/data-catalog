@@ -21,9 +21,9 @@ from django_data_catalog.file_browser import views as local_file_browser
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path("hdfs/browse/", hdfs_file_browser_views.ListFiles.as_view()),
-    path("hdfs/file_info/", hdfs_file_browser_views.GetFileInfo.as_view()),
-    path("local/list/", hdfs_file_browser_views.LocalFileFromCommandLine.as_view()),
+    path("hdfs/browse/", hdfs_file_browser_views.ListHDFSFiles.as_view()),
+    path("hdfs/file_info/", hdfs_file_browser_views.GetHDFSFileInfo.as_view()),
+#    path("local/list_tree/", hdfs_file_browser_views.LocalFileFromCommandLine.as_view()),
+    path("local/list/", hdfs_file_browser_views.LocalFileFromService.as_view()),
     path("local/download/", hdfs_file_browser_views.LocalFilesystemContentDownloadView.as_view()),
-    
 ]
