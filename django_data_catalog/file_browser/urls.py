@@ -14,9 +14,16 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path, include
+from django.urls import path
+from django_data_catalog.file_browser import views as hdfs_file_browser_views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path("files/", include("django_data_catalog.file_browser.urls")),
+    path("hdfs/browse/", hdfs_file_browser_views.ListHDFSFiles.as_view()),
+    path("hdfs/file_info/", hdfs_file_browser_views.GetHDFSFileInfo.as_view()),
+    path("local/list/", hdfs_file_browser_views.LocalFileFromService.as_view()),
+    path("local/download/", hdfs_file_browser_views.LocalFilesystemContentDownloadView.as_view()),
 ]
+
+# please copy and paste this module into any existing Django project,
+# (some simple setting changes should integrate the solution)
