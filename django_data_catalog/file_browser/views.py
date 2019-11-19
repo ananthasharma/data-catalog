@@ -11,36 +11,41 @@ from django_data_catalog.file_browser.hdfs_file_browser import MaprFSBrowser
 from django_data_catalog.CustomLogger import CustomLogger
 from django_data_catalog.file_browser.local_file_browser import LocalFSBrowser
 
-
 browser = MaprFSBrowser()
+
 
 class LocalFileFromCommandLine(APIView):
     log = CustomLogger().logger
+
     def get(self, request):
         """ Prints files/folders from local disk """
-        folder = request.GET.get("folder",'/')
+        folder = request.GET.get("folder", '/')
         self.log.debug(f"printing files/folders from root {folder}")
         fs_browser = LocalFSBrowser()
         content = fs_browser.list_using_tree(folder)
         return Response(data=content)
 
+
 class LocalFileFromService(APIView):
     log = CustomLogger().logger
+
     def get(self, request):
         """ Prints files/folders from local disk """
-        folder = request.GET.get("folder",'/')
+        folder = request.GET.get("folder", '/')
         self.log.debug(f"printing files/folders from root {folder}")
         fs_browser = LocalFSBrowser()
         content = fs_browser.list_folders(folder)
         return Response(data=content)
 
-class LocalFilesystemContentDownloadView(APIView):    
+
+class LocalFilesystemContentDownloadView(APIView):
     log = CustomLogger().logger
+
     def get(self, request):
         """ downloads a file from disk """
         file_path = request.query_params.get("file_path")
         if not file_path:
-            #no file_path supplied.
+            # no file_path supplied.
             resp = "`file_path` is a mandatory field and cannot be empty"
             self.log.debug(resp)
             return Response(data=resp, status=status.HTTP_400_BAD_REQUEST)
@@ -50,13 +55,13 @@ class LocalFilesystemContentDownloadView(APIView):
             resp = f"no file was found at {file_path}"
             self.log.debug(resp)
             return Response(data=resp, status=status.HTTP_404_NOT_FOUND)
-        
+
         if not os.path.isfile(file_path):
             resp = f"this {file_path} is not a file"
             self.log.debug(resp)
             return Response(data=resp, status=status.HTTP_406_NOT_ACCEPTABLE)
-        
-        #file exists
+
+        # file exists
         handle = open(file_path, 'rb')
         response = Response(handle, content_type="application/file")
         response['Content-Disposition'] = 'inline; filename=' + os.path.basename(file_path)
@@ -65,37 +70,38 @@ class LocalFilesystemContentDownloadView(APIView):
 
 class ListHDFSFiles(APIView):
     log = CustomLogger().logger
+
     def get(self, request, mapr_user="mapr", mapr_password=None):
-#        host = request.GET.__getitem__("host")
-        folder = request.GET.get("folder",'/')
+        #        host = request.GET.__getitem__("host")
+        folder = request.GET.get("folder", '/')
         host = request.GET.get("host", 'localhost')
-#        mapr_user = request.GET.__getitem__("user")
-#        mapr_password = request.GET.__getitem__("password") # need to unhash this value before using
-        mapr_password = None #dont want to use the unhashed password, so ignoring the implementation for now
+        #        mapr_user = request.GET.__getitem__("user")
+        #        mapr_password = request.GET.__getitem__("password") # need to unhash this value before using
+        mapr_password = None  # don't want to use the unhashed password, so ignoring the implementation for now
         content = {}
         try:
-            content = browser.list_files(folder,mapr_user, mapr_password, host)
+            content = browser.list_files(folder, mapr_user, mapr_password, host)
         except Exception:
-            self.log.debug (f"Found exception while listing files from folder {folder}")
+            self.log.debug(f"Found exception while listing files from folder {folder}")
             raise
         return Response(content)
 
 
 class GetHDFSFileInfo(APIView):
     log = CustomLogger().logger
-    def get(self, request,mapr_user="mapr",mapr_password=None):
+
+    def get(self, request, mapr_user="mapr", mapr_password=None):
         file_name = request.GET.get("file_name", None)
         host = request.GET.get("host", 'localhost')
-        mapr_password = None #dont want to use the unhashed password, so ignoring the implementation for now
-        content={}
-        if file_name == None:
-            content = {"error":"please pass 'file_name' parameter in the URL to proceed"}
+        mapr_password = None  # dont want to use the unhashed password, so ignoring the implementation for now
+        content = {}
+        if not file_name:
+            content = {"error": "please pass 'file_name' parameter in the URL to proceed"}
         else:
             try:
                 content = browser.get_file_info(file_name, mapr_user, mapr_password, host)
             except Exception:
-                self.log.debug (f"Found exception while getting file info for file {file_name}")
-                content={"error":f"File '{file_name}' not found"}
+                self.log.debug(f"Found exception while getting file info for file {file_name}")
+                content = {"error": f"File '{file_name}' not found"}
 
         return Response(content)
-

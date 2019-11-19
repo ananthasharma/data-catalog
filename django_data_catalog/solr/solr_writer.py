@@ -1,10 +1,7 @@
 import pysolr
-import pyarrow as pa
-import pyarrow.parquet as pq
-import pandas as pd
-import json
 from django.conf import settings
 from django_data_catalog.CustomLogger import CustomLogger
+
 
 class Solr:
     log = CustomLogger().logger
@@ -19,12 +16,11 @@ class Solr:
 
     def prepare(self):
         """ checks if solr object is initialized, initializes it if needed and returns """
-        if self.solr == None:
-            log.debug(f'connecting to Solr at Url {solr_url}')
+        if not self.solr:  # only build object if its None
+            self.log.debug(f'connecting to Solr at Url {self.solr_url}')
             self.solr = pysolr.Solr(self.solr_url, timeout=10, auth=None)
 
-
     def write(self, content):
+        """Write content to solr"""
         self.prepare()
         self.solr.add(docs=content, commit=True)
-    
