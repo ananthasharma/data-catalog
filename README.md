@@ -15,7 +15,7 @@
 
 ```python
 base_URL = "http://localhost:8000/"
-context_path = "local/list/"
+context_path = "files/local/list/"
 query_param = "folder"
 #query parameter accepts a string with the path to target folder
 ```
@@ -25,7 +25,7 @@ query_param = "folder"
 
 
 ```python
-!curl http://localhost:8000/local/list/
+!curl http://localhost:8000/files/local/list/
 # this command is the same as above
 
 !echo "\n\nthis command is the same as above\n\n"
@@ -61,7 +61,7 @@ query_param = "folder"
 
 
 ```python
-!curl "http://localhost:8000/local/list/?folder=/non-existent-folder"
+!curl "http://localhost:8000/files/local/list/?folder=/non-existent-folder"
 # this command is the same as above
 
 !echo "\n\nthis command is the same as above\n\n"
@@ -85,7 +85,7 @@ query_param = "folder"
 
 ```python
 
-!curl "http://localhost:8000/local/download/?file_path=/path/does/not/exist/to/this/file.txt"
+!curl "http://localhost:8000/files/local/download/?file_path=/path/does/not/exist/to/this/file.txt"
 # this command is the same as above
 
 !echo "\n\nthis command is the same as above\n\n"
@@ -106,7 +106,7 @@ query_param = "folder"
 
 ```python
 
-!curl "http://localhost:8000/local/download/"
+!curl "http://localhost:8000/files/local/download/"
 
 ```
 
@@ -117,7 +117,7 @@ query_param = "folder"
 
 ```python
 
-!curl "http://localhost:8000/local/download/?file_path=/Users"
+!curl "http://localhost:8000/files/local/download/?file_path=/Users"
 # this command is the same as above
 
 !echo "\n\nthis command is the same as above\n\n"
@@ -138,7 +138,7 @@ query_param = "folder"
 
 ```python
 
-!curl "http://localhost:8000/local/download/?file_path=/Users/asharma/Downloads/1.txt"
+!curl "http://localhost:8000/files/local/download/?file_path=/Users/asharma/Downloads/1.txt"
 # this command is the same as above
 
 !echo "\n\nthis command is the same as above\n\n"
