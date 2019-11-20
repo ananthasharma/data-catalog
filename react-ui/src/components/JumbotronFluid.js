@@ -19,6 +19,7 @@ const JumbotronFluid = props => {
                   margin: "50px",
                   backgroundColor: "lightblue"
                 }}
+                onClick={e => props.getPath(e)}
               >
                 {dir.name}
               </Col>

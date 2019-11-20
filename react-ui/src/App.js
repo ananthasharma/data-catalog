@@ -103,7 +103,7 @@ class App extends React.Component {
               <DirectoryList list={this.state.list} getPath={this.getPath} />
             </Col>
             <Col sm={8}>
-              <JumbotronFluid list={this.state.list} />
+              <JumbotronFluid list={this.state.list} getPath={this.getPath} />
             </Col>
           </Row>
         </Container>
