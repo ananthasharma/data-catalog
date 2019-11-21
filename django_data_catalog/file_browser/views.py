@@ -5,8 +5,9 @@ import os
 from django.shortcuts import render
 from rest_framework.views import APIView
 from rest_framework import status
+from django.contrib.auth import base_user
 from rest_framework.response import Response
-from django.http import JsonResponse
+from rest_framework.request import Request
 from django_data_catalog.file_browser.hdfs_file_browser import MaprFSBrowser
 from django_data_catalog.CustomLogger import CustomLogger
 from django_data_catalog.file_browser.local_file_browser import LocalFSBrowser
@@ -17,8 +18,9 @@ browser = MaprFSBrowser()
 class LocalFileFromCommandLine(APIView):
     log = CustomLogger().logger
 
-    def get(self, request):
+    def get(self, request: Request):
         """ Prints files/folders from local disk """
+        user = request.user
         folder = request.GET.get("folder", '/')
         self.log.debug(f"printing files/folders from root {folder}")
         fs_browser = LocalFSBrowser()

@@ -35,7 +35,9 @@ class LocalFSBrowser:
             print("folder not found")
             return output
         for entry in os.listdir(path=folder_path):
-            entry = folder_path + "/" + entry
+            if not folder_path.endswith("/"):
+                folder_path = folder_path + "/"
+            entry = folder_path + entry
             if path.isdir(entry):
                 # this is a folder
                 folders.append({"type": "directory", "name": entry, "contents": []})
