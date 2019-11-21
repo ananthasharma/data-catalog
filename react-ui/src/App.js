@@ -55,6 +55,7 @@ class App extends React.Component {
   }
 
   getPath = event => {
+    const rawFolder = event.target.innerText;
     let folder = new String(event.target.innerText);
     folder = folder.slice(1);
     const currentPath = [...this.state.currentPath];
@@ -63,7 +64,7 @@ class App extends React.Component {
       currentPath: currentPath
     });
     axios
-      .get(`http://localhost:8000/files/local/list/?folder=${folder}`)
+      .get(`http://localhost:8000/files/local/list/?folder=${rawFolder}`)
       .then(response => {
         console.log(response);
       })

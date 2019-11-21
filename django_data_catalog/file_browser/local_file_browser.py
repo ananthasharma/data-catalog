@@ -26,7 +26,7 @@ class LocalFSBrowser:
         return output_json
 
     def list_folders(self, folder_path):
-        #       self.log.debug(f"Listing contents of local folder :{folder_path}")
+        # self.log.debug(f"Listing contents of local folder :{folder_path}")
         output = []
         folders = []
         files = []
@@ -35,7 +35,9 @@ class LocalFSBrowser:
             print("folder not found")
             return output
         for entry in os.listdir(path=folder_path):
-            entry = folder_path + "/" + entry
+            if not folder_path.ends_with("/"):
+                folder_path = folder_path + "/"
+            entry = folder_path + entry
             if path.isdir(entry):
                 # this is a folder
                 folders.append({"type": "directory", "name": entry, "contents": []})
