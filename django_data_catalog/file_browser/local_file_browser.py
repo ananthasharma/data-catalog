@@ -41,7 +41,7 @@ class LocalFSBrowser:
             if path.isdir(entry):
                 # this is a folder
                 folders.append({"type": "directory", "name": entry, "contents": []})
-            if path.isfile(folder_path):
+            if path.isfile(entry):
                 # this is a file
                 files.append({"type": "file", "name": entry})
         depth = depth - 1  # decrement, because we've looked at 1 level already
@@ -51,7 +51,7 @@ class LocalFSBrowser:
             pass
 
         self.log.debug(f"found {len(folders)} folder and {len(files)} files")
-        folders.extend(files)
+        folders.append(files)
         output.append({"type": "directory", "name": folder_path, "contents": folders})
         return output
 
