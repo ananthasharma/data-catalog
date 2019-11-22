@@ -19,7 +19,7 @@ const FileBrowser = props => {
                 key={Math.random()}
                 type={item.type}
                 name={item.name}
-                onClick={props.onClick}
+                getFolder={props.getFolder}
               />
             );
           })
@@ -31,7 +31,7 @@ const FileBrowser = props => {
                 key={Math.random()}
                 type={item.type}
                 name={item.name}
-                onClick={props.onClick}
+                downloadFile={props.downloadFile}
               />
             );
           })

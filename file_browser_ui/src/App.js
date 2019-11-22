@@ -1,4 +1,5 @@
 import React from "react";
+import fileDownload from "js-file-download";
 import axios from "axios";
 import logo from "./logo.svg";
 import "./App.css";
@@ -50,7 +51,6 @@ class App extends React.Component {
     axios
       .get(`http://localhost:8000/files/local/list/?folder=${folder}`)
       .then(response => {
-        console.log(response);
         const path = response.data[0].name;
         let list = [];
         let files = [];
@@ -74,6 +74,17 @@ class App extends React.Component {
       });
   };
 
+  downloadFile = filePath => {
+    axios
+      .get(`http://localhost:8000/files/local/download/?file_path=${filePath}`)
+      .then(response => {
+        fileDownload(response.data, `${filePath}`);
+      })
+      .catch(error => {
+        console.log(error);
+      });
+  };
+
   render() {
     return (
       <div className="App">
@@ -82,8 +93,9 @@ class App extends React.Component {
         <FileBrowser
           list={this.state.list}
           files={this.state.files}
-          onClick={this.getFolder}
           getRoot={this.getRoot}
+          getFolder={this.getFolder}
+          downloadFile={this.downloadFile}
         />
       </div>
     );

@@ -10,7 +10,11 @@ const Item = props => (
       padding: "20px",
       margin: "20px"
     }}
-    onClick={() => props.onClick(props.name)}
+    onClick={
+      props.getFolder
+        ? () => props.getFolder(props.name)
+        : () => props.downloadFile(props.name)
+    }
   >
     {props.type === "directory" ? (
       <SvgFolderIconYellow width="40px" height="40px" />
