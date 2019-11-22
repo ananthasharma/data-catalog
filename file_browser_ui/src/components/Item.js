@@ -10,12 +10,12 @@ const Item = props => (
       padding: "20px",
       margin: "20px"
     }}
-    onClick={e => props.onClick(e)}
+    onClick={() => props.onClick(props.name)}
   >
     {props.type === "directory" ? (
       <SvgFolderIconYellow width="40px" height="40px" />
     ) : props.type === "file" ? (
-      <SvgFileIcon width="40px" height="40px" />
+      <SvgFileIcon width="30px" height="30px" />
     ) : null}
     <div>{props.name}</div>
   </div>

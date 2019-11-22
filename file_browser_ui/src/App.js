@@ -11,7 +11,8 @@ import SvgFolderIconYellow from "./icons/FolderIconYellow";
 class App extends React.Component {
   state = {
     path: [],
-    list: []
+    list: [],
+    files: []
   };
 
   componentDidMount() {
@@ -22,10 +23,22 @@ class App extends React.Component {
     axios
       .get("http://localhost:8000/files/local/list/")
       .then(response => {
-        console.log(response);
+        const path = response.data[0].name;
+        let list = [];
+        let files = [];
+        response.data[0].contents.forEach(index => {
+          if (Array.isArray(index)) {
+            index.forEach(i => {
+              files.push(i);
+            });
+          } else {
+            list.push(index);
+          }
+        });
         this.setState({
-          path: response.data[0].name,
-          list: response.data[0].contents
+          path,
+          list,
+          files
         });
       })
       .catch(error => {
@@ -33,15 +46,27 @@ class App extends React.Component {
       });
   };
 
-  getFolder = event => {
-    const folder = event.target.innerText;
+  getFolder = folder => {
     axios
       .get(`http://localhost:8000/files/local/list/?folder=${folder}`)
       .then(response => {
         console.log(response);
+        const path = response.data[0].name;
+        let list = [];
+        let files = [];
+        response.data[0].contents.forEach(index => {
+          if (Array.isArray(index)) {
+            index.forEach(i => {
+              files.push(i);
+            });
+          } else {
+            list.push(index);
+          }
+        });
         this.setState({
-          path: response.data[0].name,
-          list: response.data[0].contents
+          path,
+          list,
+          files
         });
       })
       .catch(error => {
@@ -56,6 +81,7 @@ class App extends React.Component {
         <BreadcrumbTray path={this.state.path} getRoot={this.getRoot} />
         <FileBrowser
           list={this.state.list}
+          files={this.state.files}
           onClick={this.getFolder}
           getRoot={this.getRoot}
         />
