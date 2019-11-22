@@ -22,6 +22,7 @@ class App extends React.Component {
     axios
       .get("http://localhost:8000/files/local/list/")
       .then(response => {
+        console.log(response);
         this.setState({
           path: response.data[0].name,
           list: response.data[0].contents
@@ -37,6 +38,7 @@ class App extends React.Component {
     axios
       .get(`http://localhost:8000/files/local/list/?folder=${folder}`)
       .then(response => {
+        console.log(response);
         this.setState({
           path: response.data[0].name,
           list: response.data[0].contents
@@ -51,7 +53,7 @@ class App extends React.Component {
     return (
       <div className="App">
         <Header />
-        <BreadcrumbTray path={this.state.path} />
+        <BreadcrumbTray path={this.state.path} getRoot={this.getRoot} />
         <FileBrowser
           list={this.state.list}
           onClick={this.getFolder}
