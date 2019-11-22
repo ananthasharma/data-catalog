@@ -7,10 +7,12 @@ import Col from "react-bootstrap/Col";
 const JumbotronFluid = props => {
   console.log(props);
   return (
-    <Jumbotron fluid>
-      <Container>
-        <Row>
-          {props.list[0].contents.map(dir => {
+    // <Jumbotron fluid>
+    //   <Container>
+    //     <Row>
+    <div>
+      {!props.list === []
+        ? props.list.map(dir => {
             return (
               <Col
                 key={Math.random()}
@@ -24,10 +26,12 @@ const JumbotronFluid = props => {
                 {dir.name}
               </Col>
             );
-          })}
-        </Row>
-      </Container>
-    </Jumbotron>
+          })
+        : null}
+    </div>
+    //   </Row>
+    // </Container>
+    // </Jumbotron>
   );
 };
 export default JumbotronFluid;
