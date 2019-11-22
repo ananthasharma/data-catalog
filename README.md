@@ -154,12 +154,28 @@ query_param = "folder"
     hello 
 
 
+## Test file upload
+### service saves file into the give folder
+
+### service tries to create folder if it doesn't exist; if it fails to then it returns a ```http/304 - not modified``` since nothing was modified on the server
+
 
 ```python
-
-```
-
-
-```python
+!curl -X PUT \
+  http://0.0.0.0:8000/files/local/list/ \
+  -H 'Accept: */*' \
+  -H 'Accept-Encoding: gzip, deflate' \
+  -H 'Cache-Control: no-cache' \
+  -H 'Connection: keep-alive' \
+  -H 'Content-Length: 4420811' \
+  -H 'Content-Type: application/x-www-form-urlencoded' \
+  -H 'Host: 0.0.0.0:8000' \
+  -H 'Postman-Token: 462c9038-2e3d-4764-a36e-46e50931118c,9f5dff71-6675-43f9-872b-fcf4997c8202' \
+  -H 'User-Agent: PostmanRuntime/7.19.0' \
+  -H 'cache-control: no-cache' \
+  -H 'content-type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW' \
+  -F 'file_ref=@/bin/bash' \
+  -F file_name=bash.command \
+  -F file_location=/tmp/folder/
 
 ```

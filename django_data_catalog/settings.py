@@ -27,6 +27,8 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
+APPEND_SLASH = False
+
 solr_host_ip = '192.168.190.133'
 solr_port = 8983
 solr_path = 'data-catalog'

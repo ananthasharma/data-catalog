@@ -11,6 +11,7 @@ from rest_framework.request import Request
 from django_data_catalog.file_browser.hdfs_file_browser import MaprFSBrowser
 from django_data_catalog.CustomLogger import CustomLogger
 from django_data_catalog.file_browser.local_file_browser import LocalFSBrowser
+from .forms import StorageFileForm
 
 browser = MaprFSBrowser()
 
@@ -31,9 +32,31 @@ class LocalFileFromCommandLine(APIView):
 class LocalFileFromService(APIView):
     log = CustomLogger().logger
 
-    def get(self, request):
+    def get(self, request: Request) -> Response:
         """ Prints files/folders from local disk """
         folder = request.GET.get("folder", '/')
+        self.log.debug(f"printing files/folders from root {folder}")
+        fs_browser = LocalFSBrowser()
+        content = fs_browser.list_folders(folder)
+        return Response(data=content)
+
+    def put(self, request: Request) -> Response:
+        """ writes files to local disk (or SAN storage) """
+        folder = request.GET.get("folder", '/')
+        file_form = StorageFileForm(request.POST, request.FILES)
+        if not file_form.is_valid():
+            # Something is not right.
+            return Response(data={"error": "please review the request object; file not saved"},
+                            status=status.HTTP_406_NOT_ACCEPTABLE)
+
+        file_ref = request.FILES['file_ref']
+        file_location = request.data['file_location']
+        file_name = request.data['file_name']
+        try:
+            LocalFSBrowser().store_file(file=file_ref, dir_name=file_location, file_name=file_name)
+        except IOError as e:
+            return Response(data={"error":str(e)},status=status.HTTP_304_NOT_MODIFIED)
+
         self.log.debug(f"printing files/folders from root {folder}")
         fs_browser = LocalFSBrowser()
         content = fs_browser.list_folders(folder)
