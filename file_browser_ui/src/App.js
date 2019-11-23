@@ -1,13 +1,12 @@
 import React from "react";
 import fileDownload from "js-file-download";
 import axios from "axios";
-import logo from "./logo.svg";
 import "./App.css";
 
 import Header from "./components/Header";
 import BreadcrumbTray from "./components/BreadcrumbTray";
 import FileBrowser from "./components/FileBrowser";
-import SvgFolderIconYellow from "./icons/FolderIconYellow";
+import FileUpload from "./components/FileUpload";
 
 class App extends React.Component {
   state = {
@@ -97,6 +96,7 @@ class App extends React.Component {
           getFolder={this.getFolder}
           downloadFile={this.downloadFile}
         />
+        <FileUpload />
       </div>
     );
   }
