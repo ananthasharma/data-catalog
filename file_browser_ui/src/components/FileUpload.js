@@ -22,8 +22,8 @@ const FileUpload = props => {
     <div className="App">
       <FilePond
         server={{
-          url: 'http://localhost:8000/files/local/list/',
-          method: "PATCH",
+          url: 'http://0.0.0.0:8000/files/local/list/',
+          method: "PUT",
         //   headers: {
         //     "Accept": "*/*",
         //     "Accept-Encoding": "gzip, deflate",

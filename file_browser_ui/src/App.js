@@ -12,7 +12,8 @@ class App extends React.Component {
   state = {
     path: [],
     list: [],
-    files: []
+    files: [],
+    fileToUpload: null
   };
 
   componentDidMount() {
@@ -84,11 +85,40 @@ class App extends React.Component {
       });
   };
 
+  handleFileUpload = event => {
+    console.log(event.target);
+    console.log(event.target.files[0]);
+    const file = event.target.files[0];
+    const data = new FormData();
+    data.append("file", file);
+    console.log(data);
+    axios
+      .put("http://0.0.0.0:8000/files/local/list/", file)
+      .then(response => {
+        console.log(response);
+      })
+      .catch(error => {
+        console.log(error);
+      });
+  };
+
   render() {
     return (
       <div className="App">
         <Header />
         <BreadcrumbTray path={this.state.path} getRoot={this.getRoot} />
+        <input
+          style={{
+            margin: "auto",
+            height: "50px",
+            width: "50px",
+            border: "1px solid black",
+            backgroundColor: " gray"
+          }}
+          type="file"
+          name="file"
+          onChange={this.handleFileUpload}
+        ></input>
         <FileBrowser
           list={this.state.list}
           files={this.state.files}
