@@ -10,7 +10,7 @@ import FileBrowser from "./components/FileBrowser";
 
 class App extends React.Component {
   state = {
-    path: [],
+    path: "",
     list: [],
     files: [],
     fileToUpload: null
@@ -47,11 +47,25 @@ class App extends React.Component {
       });
   };
 
+  goBack = () => {
+    const path = this.state.path;
+    const removeSlash = path.slice(0, path.length - 1);
+    const index = removeSlash.lastIndexOf("/");
+    let slicePath;
+    if (index !== path.length - 1) {
+      slicePath = path.slice(0, index + 1);
+    }
+    this.getFolder(slicePath);
+  };
+
   getFolder = folder => {
     axios
       .get(`http://localhost:8000/files/local/list/?folder=${folder}`)
       .then(response => {
-        const path = response.data[0].name;
+        let path = response.data[0].name;
+        if (!path.endsWith("/")) {
+          path = path + "/";
+        }
         let list = [];
         let files = [];
         response.data[0].contents.forEach(index => {
@@ -89,7 +103,11 @@ class App extends React.Component {
     return (
       <div className="App">
         <Header />
-        <BreadcrumbTray path={this.state.path} getRoot={this.getRoot} />
+        <BreadcrumbTray
+          path={this.state.path}
+          getRoot={this.getRoot}
+          goBack={this.goBack}
+        />
         <FileBrowser
           list={this.state.list}
           files={this.state.files}

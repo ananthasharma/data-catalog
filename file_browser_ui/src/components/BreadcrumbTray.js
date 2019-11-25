@@ -14,6 +14,9 @@ const BreadcrumbTray = props => (
     <button style={{ marginRight: "5px" }} onClick={props.getRoot}>
       Root
     </button>
+    <button style={{marginRight: "5px"}} onClick={props.goBack}>
+      Go back
+    </button>
     <Breadcrumb path={props.path} />
   </div>
 );
