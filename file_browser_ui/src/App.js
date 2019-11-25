@@ -1,18 +1,19 @@
 import React from "react";
 import fileDownload from "js-file-download";
+import Dropzone from "react-dropzone";
 import axios from "axios";
 import "./App.css";
 
 import Header from "./components/Header";
 import BreadcrumbTray from "./components/BreadcrumbTray";
 import FileBrowser from "./components/FileBrowser";
-import FileUpload from "./components/FileUpload";
 
 class App extends React.Component {
   state = {
     path: [],
     list: [],
-    files: []
+    files: [],
+    fileToUpload: null
   };
 
   componentDidMount() {
@@ -96,7 +97,43 @@ class App extends React.Component {
           getFolder={this.getFolder}
           downloadFile={this.downloadFile}
         />
-        <FileUpload />
+        <Dropzone
+          onDrop={acceptedFiles => {
+            const file = acceptedFiles[0];
+            const fileName = acceptedFiles[0].name;
+            const form = new FormData();
+            form.append("file_ref", file);
+            form.append("file_name", fileName);
+            form.append("file_location", "/tmp/folder5/");
+            axios
+              .put("http://0.0.0.0:8000/files/local/list/", form)
+              .then(response => {
+                console.log(response);
+              })
+              .catch(error => {
+                console.log(error);
+              });
+          }}
+        >
+          {({ getRootProps, getInputProps }) => (
+            <section
+              style={{
+                display: "block",
+                margin: "auto",
+                marginTop: "20px",
+                width: "50%",
+                height: "50px",
+                border: "1px dotted black",
+                backgroundColor: "lightGray"
+              }}
+            >
+              <div {...getRootProps()}>
+                <input {...getInputProps()} />
+                <p>Drag 'n' drop some files here, or click to select files</p>
+              </div>
+            </section>
+          )}
+        </Dropzone>
       </div>
     );
   }
