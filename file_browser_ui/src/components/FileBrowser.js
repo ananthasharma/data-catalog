@@ -24,7 +24,7 @@ const FileBrowser = props => {
             );
           })
         : null}
-      {props.files.length
+      {props.files.lengths
         ? props.files.map(item => {
             return (
               <Item

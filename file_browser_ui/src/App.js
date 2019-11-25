@@ -12,8 +12,16 @@ class App extends React.Component {
   state = {
     path: "",
     list: [],
+    sortedList: [],
+    showList: [],
     files: [],
-    fileToUpload: null
+    sortedFiles: [],
+    showFiles: [],
+    showFilterMenu: false,
+    sortOrder: "a - z",
+    isSorted: false,
+    foldersOnly: false,
+    filesOnly: false
   };
 
   componentDidMount() {
@@ -26,20 +34,26 @@ class App extends React.Component {
       .then(response => {
         const path = response.data[0].name;
         let list = [];
+        let showList = [];
         let files = [];
+        let showFiles = [];
         response.data[0].contents.forEach(index => {
           if (Array.isArray(index)) {
             index.forEach(i => {
               files.push(i);
+              showFiles.push(i);
             });
           } else {
             list.push(index);
+            showList.push(index);
           }
         });
         this.setState({
           path,
           list,
-          files
+          showList,
+          files,
+          showFiles
         });
       })
       .catch(error => {
@@ -67,20 +81,26 @@ class App extends React.Component {
           path = path + "/";
         }
         let list = [];
+        let showList = [];
         let files = [];
+        let showFiles = [];
         response.data[0].contents.forEach(index => {
           if (Array.isArray(index)) {
             index.forEach(i => {
               files.push(i);
+              showFiles.push(i);
             });
           } else {
             list.push(index);
+            showList.push(index);
           }
         });
         this.setState({
           path,
           list,
-          files
+          showList,
+          files,
+          showFiles
         });
       })
       .catch(error => {
@@ -99,6 +119,136 @@ class App extends React.Component {
       });
   };
 
+  filterResults = () => {
+    const isActive = this.state.showFilterMenu;
+    this.setState({ showFilterMenu: !isActive });
+  };
+
+  sortResults = () => {
+    const list = [...this.state.list];
+    const files = [...this.state.files];
+    if (this.state.sortOrder === "a - z") {
+      const sortedList = list.sort(function(a, b) {
+        if (a.name > b.name) {
+          return 1;
+        }
+        if (a.name < b.name) {
+          return -1;
+        }
+        return 0;
+      });
+      const sortedFiles = files.sort(function(a, b) {
+        if (a.name > b.name) {
+          return 1;
+        }
+        if (a.name < b.name) {
+          return -1;
+        }
+        return 0;
+      });
+      this.setState({
+        sortedList,
+        sortedFiles,
+        showList: sortedList,
+        showFiles: sortedFiles,
+        sortOrder: "z - a",
+        isSorted: true
+      });
+    } else if (this.state.sortOrder === "z - a") {
+      const sortedList = list.sort(function(a, b) {
+        if (a.name < b.name) {
+          return 1;
+        }
+        if (a.name > b.name) {
+          return -1;
+        }
+        return 0;
+      });
+      const sortedFiles = files.sort(function(a, b) {
+        if (a.name < b.name) {
+          return 1;
+        }
+        if (a.name > b.name) {
+          return -1;
+        }
+        return 0;
+      });
+      this.setState({
+        sortedList,
+        sortedFiles,
+        showList: sortedList,
+        showFiles: sortedFiles,
+        sortOrder: "a - z",
+        isSorted: true
+      });
+    }
+  };
+
+  foldersOnly = () => {
+    let list, files;
+    if (this.state.isSorted) {
+      list = [...this.state.sortedList];
+      files = [...this.state.sortedFiles];
+    } else {
+      list = [...this.state.list];
+      files = [...this.state.files];
+    }
+    if (!this.state.foldersOnly) {
+      this.setState({
+        showFiles: [],
+        showList: list,
+        foldersOnly: true,
+        filesOnly: false
+      });
+    } else if (this.state.foldersOnly) {
+      this.setState({
+        showFiles: files,
+        showList: list,
+        foldersOnly: false,
+        filesOnly: false
+      });
+    }
+  };
+
+  filesOnly = () => {
+    let list, files;
+    if (this.state.isSorted) {
+      list = [...this.state.sortedList];
+      files = [...this.state.sortedFiles];
+    } else {
+      list = [...this.state.list];
+      files = [...this.state.files];
+    }
+    if (!this.state.filesOnly) {
+      this.setState({
+        showList: [],
+        showFiles: files,
+        filesOnly: true,
+        foldersOnly: false
+      });
+    } else if (this.state.filesOnly) {
+      this.setState({
+        showList: list,
+        showFiles: files,
+        filesOnly: false,
+        foldersOnly: false
+      });
+    }
+  };
+
+  clearAll = () => {
+    const list = [...this.state.list];
+    const files = [...this.state.files];
+    this.setState({
+      showList: list,
+      showFiles: files,
+      sortOrder: "a - z",
+      isSorted: false,
+      foldersOnly: false,
+      filesOnly: false
+    });
+  };
+
   render() {
     return (
       <div className="App">
@@ -107,13 +257,44 @@ class App extends React.Component {
           path={this.state.path}
           getRoot={this.getRoot}
           goBack={this.goBack}
+          filterResults={this.filterResults}
         />
+        {this.state.showFilterMenu ? (
+          <div
+            style={{
+              display: "flex",
+              height: "2.5vh",
+              justifyContent: "center",
+              border: "1px solid gray",
+              backgroundColor: "lightGray"
+            }}
+          >
+            <button onClick={this.sortResults}>
+              Sort {this.state.sortOrder}
+            </button>
+            <button onClick={this.foldersOnly}>
+              {this.state.foldersOnly ? (
+                <strong>Folders Only</strong>
+              ) : (
+                <p>Folders Only</p>
+              )}
+            </button>
+            <button onClick={this.filesOnly}>
+              {this.state.filesOnly ? (
+                <strong>Files Only</strong>
+              ) : (
+                <p>Files Only</p>
+              )}
+            </button>
+            <button onClick={this.clearAll}>Clear All</button>
+          </div>
+        ) : null}
         <FileBrowser
-          list={this.state.list}
-          files={this.state.files}
-          getRoot={this.getRoot}
+          list={this.state.showList}
+          files={this.state.showFiles}
           getFolder={this.getFolder}
           downloadFile={this.downloadFile}
+          getRoot={this.getRoot}
         />
         <Dropzone
           onDrop={acceptedFiles => {

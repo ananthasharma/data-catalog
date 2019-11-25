@@ -6,15 +6,28 @@ const BreadcrumbTray = props => (
     style={{
       display: "flex",
       justifyContent: "center",
+      alignContent: "center",
       border: "1px solid gray",
-      height: "2.5vh",
+      height: "3vh",
       backgroundColor: "lightGray"
     }}
   >
-    <button style={{ marginRight: "5px" }} onClick={props.getRoot}>
+    <button
+      style={{ height: "2.5vh", marginRight: "10px" }}
+      onClick={props.filterResults}
+    >
+      Filter
+    </button>
+    <button
+      style={{ height: "2.5vh", marginRight: "10px" }}
+      onClick={props.getRoot}
+    >
       Root
     </button>
-    <button style={{marginRight: "5px"}} onClick={props.goBack}>
+    <button
+      style={{ height: "2.5vh", marginRight: "10px" }}
+      onClick={props.goBack}
+    >
       Go back
     </button>
     <Breadcrumb path={props.path} />
