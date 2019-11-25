@@ -25,6 +25,10 @@ SECRET_KEY = 'kqfs$-+z0j495pl2$$o0zv2(r)otp9i47ruqwl(!kb^i9csb*o'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
+# change to whatever folder to be the base,
+# the system will only browse for files from this folder down.
+BASE_FOLDER_FOR_FILE_BROWSER = "/Users"
+
 ALLOWED_HOSTS = ['*']
 
 APPEND_SLASH = False

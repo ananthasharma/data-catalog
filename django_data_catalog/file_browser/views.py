@@ -12,6 +12,7 @@ from django_data_catalog.file_browser.hdfs_file_browser import MaprFSBrowser
 from django_data_catalog.CustomLogger import CustomLogger
 from django_data_catalog.file_browser.local_file_browser import LocalFSBrowser
 from .forms import StorageFileForm
+from django.conf import settings
 
 browser = MaprFSBrowser()
 
@@ -22,8 +23,15 @@ class LocalFileFromCommandLine(APIView):
     def get(self, request: Request):
         """ Prints files/folders from local disk """
         user = request.user
-        folder = request.GET.get("folder", '/')
-        self.log.debug(f"printing files/folders from root {folder}")
+        default_folder: str = settings.BASE_FOLDER_FOR_FILE_BROWSER
+        if not default_folder.endswith("/"):
+            default_folder = default_folder + "/"
+        folder: str = request.GET.get("folder", default_folder)
+        if not folder.lower().startswith(default_folder.lower()):
+            # this is a sub directory
+            folder = default_folder + folder
+
+        self.log.debug(f"printing files/folders from root {folder}; base_folder : {default_folder}")
         fs_browser = LocalFSBrowser()
         content = fs_browser.list_using_tree(folder)
         return Response(data=content)
@@ -35,8 +43,22 @@ class LocalFileFromService(APIView):
     def get(self, request: Request) -> Response:
         """ Prints files/folders from local disk """
         folder = request.GET.get("folder", '/')
-        self.log.debug(f"printing files/folders from root {folder}")
+        default_folder: str = settings.BASE_FOLDER_FOR_FILE_BROWSER
+        if not default_folder.endswith("/"):
+            default_folder = default_folder + "/"
+        folder: str = request.GET.get("folder", default_folder)
+        if not folder.lower().startswith(default_folder.lower()):
+            # this is a sub directory
+            folder = default_folder + folder
+
+#        if folder.index("..") > 0:
+            # the user is trying to get to a parent folder
+#           folder = default_folder
+#          self.log.warn(f"user is trying to list content outside configured boundaries")
+
+        self.log.debug(f"printing files/folders from root {folder}; base_folder : {default_folder}")
         fs_browser = LocalFSBrowser()
+        folder = folder.replace("//", "/")
         content = fs_browser.list_folders(folder)
         return Response(data=content)
 
@@ -55,7 +77,7 @@ class LocalFileFromService(APIView):
         try:
             LocalFSBrowser().store_file(file=file_ref, dir_name=file_location, file_name=file_name)
         except IOError as e:
-            return Response(data={"error":str(e)},status=status.HTTP_304_NOT_MODIFIED)
+            return Response(data={"error": str(e)}, status=status.HTTP_304_NOT_MODIFIED)
 
         self.log.debug(f"printing files/folders from root {folder}")
         fs_browser = LocalFSBrowser()
