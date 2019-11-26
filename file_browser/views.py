@@ -1,16 +1,12 @@
-from django.shortcuts import render
-
 # Create your views here.
 import os
-from django.shortcuts import render
 from rest_framework.views import APIView
 from rest_framework import status
-from django.contrib.auth import base_user
 from rest_framework.response import Response
 from rest_framework.request import Request
-from django_data_catalog.file_browser.hdfs_file_browser import MaprFSBrowser
-from django_data_catalog.CustomLogger import CustomLogger
-from django_data_catalog.file_browser.local_file_browser import LocalFSBrowser
+from .hdfs_file_browser import MaprFSBrowser
+from core.CustomLogger import CustomLogger
+from .local_file_browser import LocalFSBrowser
 from .forms import StorageFileForm
 from django.conf import settings
 
@@ -51,16 +47,35 @@ class LocalFileFromService(APIView):
             # this is a sub directory
             folder = default_folder + folder
 
-#        if folder.index("..") > 0:
-            # the user is trying to get to a parent folder
-#           folder = default_folder
-#          self.log.warn(f"user is trying to list content outside configured boundaries")
+        #        if folder.index("..") > 0:
+        # the user is trying to get to a parent folder
+        #           folder = default_folder
+        #          self.log.warn(f"user is trying to list content outside configured boundaries")
 
         self.log.debug(f"printing files/folders from root {folder}; base_folder : {default_folder}")
         fs_browser = LocalFSBrowser()
         folder = folder.replace("//", "/")
-        content = fs_browser.list_folders(folder)
+        try:
+            content = fs_browser.list_folders(folder)
+        except ValueError as err:
+            return Response(data=str(err), status=status.HTTP_406_NOT_ACCEPTABLE)
         return Response(data=content)
+
+    def delete(self, request: Request) -> Response:
+        """Deletes a given file (not folder)"""
+        file_to_delete = request.GET.get("file_to_delete", None)
+        if not file_to_delete:
+            # nothing was sent for deletion
+            self.log.error("No file sent for delete operation")
+            return Response(data={"error": "No file supplied for delete; use `file_to_delete` property as query_param "
+                                           "to specify a file"}, status=status.HTTP_400_BAD_REQUEST)
+        try:
+            LocalFSBrowser().remove_file(file_to_delete)
+            self.log.info(f"deleted file {file_to_delete}")
+        except ValueError as err:
+            return Response(data={"error": str(err)}, status=status.HTTP_304_NOT_MODIFIED)
+
+        return Response(data={"status": "success"}, status=status.HTTP_204_NO_CONTENT)
 
     def put(self, request: Request) -> Response:
         """ writes files to local disk (or SAN storage) """
@@ -122,8 +137,6 @@ class ListHDFSFiles(APIView):
         #        host = request.GET.__getitem__("host")
         folder = request.GET.get("folder", '/')
         host = request.GET.get("host", 'localhost')
-        #        mapr_user = request.GET.__getitem__("user")
-        #        mapr_password = request.GET.__getitem__("password") # need to unhash this value before using
         mapr_password = None  # don't want to use the unhashed password, so ignoring the implementation for now
         content = {}
         try:

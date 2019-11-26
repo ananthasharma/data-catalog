@@ -18,5 +18,5 @@ from django.urls import path, include
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path("files/", include("django_data_catalog.file_browser.urls")),
+    path("files/", include("file_browser.urls")),
 ]
