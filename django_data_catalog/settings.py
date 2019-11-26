@@ -50,8 +50,8 @@ INSTALLED_APPS = [
     'rest_framework',
     'corsheaders',
     'django_data_catalog',
-    'django_data_catalog.solr',
-    'django_data_catalog.file_browser',
+    'solr',
+    'file_browser',
 ]
 
 MIDDLEWARE = [

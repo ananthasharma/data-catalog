@@ -1,6 +1,6 @@
 import pysolr
 from django.conf import settings
-from django_data_catalog.CustomLogger import CustomLogger
+from core.CustomLogger import CustomLogger
 
 
 class Solr:

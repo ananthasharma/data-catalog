@@ -15,14 +15,14 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from django_data_catalog.file_browser import views as hdfs_file_browser_views
+from file_browser import views as file_browser_views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path("hdfs/browse/", hdfs_file_browser_views.ListHDFSFiles.as_view()),
-    path("hdfs/file_info/", hdfs_file_browser_views.GetHDFSFileInfo.as_view()),
-    path("local/list/", hdfs_file_browser_views.LocalFileFromService.as_view()),
-    path("local/download/", hdfs_file_browser_views.LocalFilesystemContentDownloadView.as_view()),
+    path("hdfs/browse/", file_browser_views.ListHDFSFiles.as_view()),
+    path("hdfs/file_info/", file_browser_views.GetHDFSFileInfo.as_view()),
+    path("local/list/", file_browser_views.LocalFileFromService.as_view()),
+    path("local/download/", file_browser_views.LocalFilesystemContentDownloadView.as_view()),
 ]
 
 # please copy and paste this module into any existing Django project,

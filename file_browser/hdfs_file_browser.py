@@ -2,7 +2,7 @@ import pyarrow as pa
 import pyarrow.parquet as pq
 import json
 from pathlib import Path
-from django_data_catalog.CustomLogger import CustomLogger
+from core.CustomLogger import CustomLogger
 
 
 class MaprFSBrowser:

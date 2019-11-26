@@ -1,10 +1,8 @@
 import os
 import json
 from os import path
-from django_data_catalog.CustomLogger import CustomLogger
+from core.CustomLogger import CustomLogger
 
-
-# from django_data_catalog.CustomLogger import CustomLogger
 
 class LocalFSBrowser:
     log = CustomLogger.logger
@@ -38,6 +36,11 @@ class LocalFSBrowser:
             if not folder_path.endswith("/"):
                 folder_path = folder_path + "/"
             entry = folder_path + entry
+            if ".." in entry:
+                # the entry contains reference to parent folder.
+                # we need to stop this call
+                raise ValueError({"error": "reference to parent folder isn't allowed (basically no '..')"})
+
             if path.isdir(entry):
                 # this is a folder
                 folders.append({"type": "directory", "name": entry, "contents": []})
@@ -67,7 +70,7 @@ class LocalFSBrowser:
 
         target_file_name = dir_name + file_name;
         self.log.debug(f"saving to {target_file_name}")
-        os.mkdir(path=dir_name) # create the folder; if it exists, nothing changes; if it doesn't create it
+        os.mkdir(path=dir_name)  # create the folder; if it exists, nothing changes; if it doesn't create it
         if not os.path.exists(dir_name):
             # Alas! our attempt to create a folder has failed; we cannot store a file in a non existent folder.
             # lets stop here.
@@ -76,9 +79,14 @@ class LocalFSBrowser:
         if os.path.exists(target_file_name):
             """file already exists with this name"""
             # TODO: check if the user has the ability to overwrite this file
-
+            # also, is this check needed?
+            pass
         # assuming the user has the role to store this file in this location
         try:
+            # here, the
+            # 1. User has rights to write into provided path
+            # 2. Another file with the same name doesn't already exist here
+            # 3.
             # write to the file at destination
             with open(target_file_name, 'wb+') as destination:
                 for chunk in file.chunks():
@@ -89,3 +97,7 @@ class LocalFSBrowser:
             return False
 
         return True
+
+    def remove_file(self, file_to_delete):
+        """Implement delete file feature"""
+        pass
