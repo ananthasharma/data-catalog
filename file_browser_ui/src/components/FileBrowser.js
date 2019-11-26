@@ -2,13 +2,15 @@ import React from "react";
 import Item from "./Item.js";
 
 const FileBrowser = props => {
+  console.log(props);
   return (
     <div
       style={{
         display: "flex",
         flexWrap: "wrap",
         justifyContent: "space-evenly",
-        width: "65%",
+        height: "75vh",
+        width: "50vw",
         margin: "auto"
       }}
     >
@@ -24,8 +26,9 @@ const FileBrowser = props => {
             );
           })
         : null}
-      {props.files.lengths
+      {props.files.length
         ? props.files.map(item => {
+            console.log(item);
             return (
               <Item
                 key={Math.random()}
@@ -47,7 +50,17 @@ const FileBrowser = props => {
             There are no folders or files in this path. Click to go back to
             root.
           </p>
-          <button style={{ height: "25px" }} onClick={props.getRoot}>
+          <button
+            style={{
+              height: "2.5vh",
+              margin: "auto",
+              marginRight: "1vw",
+              borderRadius: "5px",
+              width: "5vw",
+              backgroundColor: "lightGray"
+            }}
+            onClick={props.getRoot}
+          >
             Root
           </button>
         </div>

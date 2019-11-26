@@ -1,36 +1,99 @@
 import React from "react";
+import Dropzone from "react-dropzone";
+import axios from "axios";
 import Breadcrumb from "./Breadcrumb";
 
 const BreadcrumbTray = props => (
   <div
     style={{
-      display: "flex",
-      justifyContent: "center",
-      alignContent: "center",
+      display: "block",
       border: "1px solid gray",
-      height: "3vh",
+      height: "7.5vh",
+      width: "100%",
       backgroundColor: "lightGray"
     }}
   >
+    <Breadcrumb path={props.path} />
     <button
-      style={{ height: "2.5vh", marginRight: "10px" }}
-      onClick={props.filterResults}
-    >
-      Filter
-    </button>
-    <button
-      style={{ height: "2.5vh", marginRight: "10px" }}
+      style={{
+        height: "2.5vh",
+        margin: "auto",
+        marginRight: "1vw",
+        borderRadius: "5px",
+        width: "5vw"
+      }}
       onClick={props.getRoot}
     >
       Root
     </button>
+
     <button
-      style={{ height: "2.5vh", marginRight: "10px" }}
+      style={{
+        height: "2.5vh",
+        margin: "auto",
+        marginRight: "1vw",
+        borderRadius: "5px",
+        width: "5vw"
+      }}
       onClick={props.goBack}
     >
       Go back
     </button>
-    <Breadcrumb path={props.path} />
+    <button
+      style={{
+        height: "2.5vh",
+        margin: "auto",
+        marginRight: "1vw",
+        borderRadius: "5px",
+        width: "5vw"
+      }}
+      onClick={props.filterResults}
+    >
+      Filter
+    </button>
+    <Dropzone
+      onDrop={acceptedFiles => {
+        const file = acceptedFiles[0];
+        const fileName = acceptedFiles[0].name;
+        const form = new FormData();
+        form.append("file_ref", file);
+        form.append("file_name", fileName);
+        form.append("file_location", props.path);
+        axios
+          .put("http://0.0.0.0:8000/files/local/list/", form)
+          .then(response => {
+            console.log(response);
+          })
+          .catch(error => {
+            console.log(error);
+          });
+      }}
+    >
+      {({ getRootProps, getInputProps }) => (
+        <button
+          style={{
+            // display: "block",
+            // margin: "auto",
+            // marginTop: "20px",
+            // width: "50%",
+            // height: "5vh",
+            // border: "1px dotted black",
+            // backgroundColor: "lightGray"
+            height: "2.5vh",
+            margin: "auto",
+            marginRight: "1vw",
+            borderRadius: "5px",
+            width: "5vw"
+          }}
+          {...getRootProps()}
+        >
+          {/* <div  tyle={{ height: "100%", width: "100%" }}{...getRootProps()}> */}
+          <input {...getInputProps()} />
+          <p>Upload</p>
+          {/* </div> */}
+        </button>
+      )}
+    </Dropzone>
   </div>
 );
 

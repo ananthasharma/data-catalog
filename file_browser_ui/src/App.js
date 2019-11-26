@@ -32,6 +32,7 @@ class App extends React.Component {
     axios
       .get("http://localhost:8000/files/local/list/")
       .then(response => {
+        console.log(response);
         const path = response.data[0].name;
         let list = [];
         let showList = [];
@@ -76,6 +77,7 @@ class App extends React.Component {
     axios
       .get(`http://localhost:8000/files/local/list/?folder=${folder}`)
       .then(response => {
+        console.log(response);
         let path = response.data[0].name;
         if (!path.endsWith("/")) {
           path = path + "/";
@@ -263,30 +265,69 @@ class App extends React.Component {
           <div
             style={{
               display: "flex",
-              height: "2.5vh",
+              height: "5vh",
               justifyContent: "center",
+              alignItems: "center",
               border: "1px solid gray",
               backgroundColor: "lightGray"
             }}
           >
-            <button onClick={this.sortResults}>
+            <button
+              style={{
+                height: "2.5vh",
+                // margin: "auto",
+                marginRight: "1vw",
+                borderRadius: "5px",
+                width: "5vw"
+              }}
+              onClick={this.sortResults}
+            >
               Sort {this.state.sortOrder}
             </button>
-            <button onClick={this.foldersOnly}>
+            <button
+              style={{
+                height: "2.5vh",
+                // margin: "auto",
+                marginRight: "1vw",
+                borderRadius: "5px",
+                width: "5vw"
+              }}
+              onClick={this.foldersOnly}
+            >
               {this.state.foldersOnly ? (
                 <strong>Folders Only</strong>
               ) : (
                 <p>Folders Only</p>
               )}
             </button>
-            <button onClick={this.filesOnly}>
+            <button
+              style={{
+                height: "2.5vh",
+                // margin: "auto",
+                marginRight: "1vw",
+                borderRadius: "5px",
+                width: "5vw"
+              }}
+              onClick={this.filesOnly}
+            >
               {this.state.filesOnly ? (
                 <strong>Files Only</strong>
               ) : (
                 <p>Files Only</p>
               )}
             </button>
-            <button onClick={this.clearAll}>Clear All</button>
+            <button
+              style={{
+                height: "2.5vh",
+                // margin: "auto",
+                marginRight: "1vw",
+                borderRadius: "5px",
+                width: "5vw"
+              }}
+              onClick={this.clearAll}
+            >
+              Clear All
+            </button>
           </div>
         ) : null}
         <FileBrowser
@@ -296,12 +337,10 @@ class App extends React.Component {
           downloadFile={this.downloadFile}
           getRoot={this.getRoot}
         />
-        <Dropzone
+        {/* <Dropzone
           onDrop={acceptedFiles => {
             const file = acceptedFiles[0];
             const fileName = acceptedFiles[0].name;
-            console.log(fileName);
-            console.log(this.state.path);
             const form = new FormData();
             form.append("file_ref", file);
             form.append("file_name", fileName);
@@ -321,9 +360,9 @@ class App extends React.Component {
               style={{
                 display: "block",
                 margin: "auto",
-                marginTop: "20px",
+                marginTop: "2.5vh",
                 width: "50%",
-                height: "50px",
+                height: "5vh",
                 border: "1px dotted black",
                 backgroundColor: "lightGray"
               }}
@@ -334,7 +373,7 @@ class App extends React.Component {
               </div>
             </section>
           )}
-        </Dropzone>
+        </Dropzone> */}
       </div>
     );
   }
