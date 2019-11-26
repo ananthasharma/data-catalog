@@ -300,10 +300,12 @@ class App extends React.Component {
           onDrop={acceptedFiles => {
             const file = acceptedFiles[0];
             const fileName = acceptedFiles[0].name;
+            console.log(fileName);
+            console.log(this.state.path);
             const form = new FormData();
             form.append("file_ref", file);
             form.append("file_name", fileName);
-            form.append("file_location", "/tmp/folder5/");
+            form.append("file_location", this.state.path);
             axios
               .put("http://0.0.0.0:8000/files/local/list/", form)
               .then(response => {
