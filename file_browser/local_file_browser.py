@@ -69,6 +69,7 @@ class LocalFSBrowser:
             dir_name = dir_name + "/"
 
         target_file_name = dir_name + file_name;
+
         self.log.debug(f"saving to {target_file_name}")
         os.mkdir(path=dir_name)  # create the folder; if it exists, nothing changes; if it doesn't create it
         if not os.path.exists(dir_name):
@@ -80,7 +81,7 @@ class LocalFSBrowser:
             """file already exists with this name"""
             # TODO: check if the user has the ability to overwrite this file
             # also, is this check needed?
-            pass
+            raise IOError("File already exists, cannot overwrite.")
         # assuming the user has the role to store this file in this location
         try:
             # here, the
@@ -94,7 +95,7 @@ class LocalFSBrowser:
         except IOError:
             # whenever something bad happens while writing to the file
             self.log.debug(f"trouble writing to location {target_file_name}")
-            return False
+            raise IOError(f"trouble writing to location {target_file_name}")
 
         return True
 
