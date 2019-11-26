@@ -75,7 +75,8 @@ class LocalFSBrowser:
         if not os.path.exists(dir_name):
             # Alas! our attempt to create a folder has failed; we cannot store a file in a non existent folder.
             # lets stop here.
-            raise IOError("Unable to create folder")
+            pass 
+            # raise IOError("Unable to create folder")
 
         if os.path.exists(target_file_name):
             """file already exists with this name"""
