@@ -7,7 +7,7 @@ const Header = () => (
       display: "flex",
       justifyContent: "center",
       alignItems: "center",
-      height: "5vh",
+      height: "7.5vh",
       width: "100%",
       margin: "auto",
       border: "1px solid gray",

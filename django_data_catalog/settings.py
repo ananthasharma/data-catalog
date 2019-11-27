@@ -27,7 +27,7 @@ DEBUG = True
 
 # change to whatever folder to be the base,
 # the system will only browse for files from this folder down.
-BASE_FOLDER_FOR_FILE_BROWSER = "/Users"
+BASE_FOLDER_FOR_FILE_BROWSER = "/"
 
 ALLOWED_HOSTS = ['*']
 CORS_ORIGIN_ALLOW_ALL = True
