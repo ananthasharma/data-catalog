@@ -94,9 +94,9 @@ class LocalFileFromService(APIView):
         except IOError as e:
             return Response(data={"error": str(e)}, status=status.HTTP_304_NOT_MODIFIED)
 
-        self.log.debug(f"printing files/folders from root {folder}")
+        self.log.debug(f"printing files/folders from root {file_location}")
         fs_browser = LocalFSBrowser()
-        content = fs_browser.list_folders(folder)
+        content = fs_browser.list_folders(file_location)
         return Response(data=content)
 
 
