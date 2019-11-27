@@ -1,6 +1,5 @@
 import React from "react";
 import fileDownload from "js-file-download";
-import Dropzone from "react-dropzone";
 import axios from "axios";
 import "./App.css";
 
@@ -32,7 +31,6 @@ class App extends React.Component {
     axios
       .get("http://localhost:8000/files/local/list/")
       .then(response => {
-        console.log(response);
         const path = response.data[0].name;
         let list = [];
         let showList = [];
@@ -77,7 +75,6 @@ class App extends React.Component {
     axios
       .get(`http://localhost:8000/files/local/list/?folder=${folder}`)
       .then(response => {
-        console.log(response);
         let path = response.data[0].name;
         if (!path.endsWith("/")) {
           path = path + "/";
@@ -108,6 +105,35 @@ class App extends React.Component {
       .catch(error => {
         console.log(error);
       });
+  };
+
+  refreshStateAfterUpload = response => {
+    let path = response.data[0].name;
+    if (!path.endsWith("/")) {
+      path = path + "/";
+    }
+    let list = [];
+    let showList = [];
+    let files = [];
+    let showFiles = [];
+    response.data[0].contents.forEach(index => {
+      if (Array.isArray(index)) {
+        index.forEach(i => {
+          files.push(i);
+          showFiles.push(i);
+        });
+      } else {
+        list.push(index);
+        showList.push(index);
+      }
+    });
+    this.setState({
+      path,
+      list,
+      showList,
+      files,
+      showFiles
+    });
   };
 
   downloadFile = filePath => {
@@ -260,6 +286,7 @@ class App extends React.Component {
           getRoot={this.getRoot}
           goBack={this.goBack}
           filterResults={this.filterResults}
+          refreshStateAfterUpload={this.refreshStateAfterUpload}
         />
         {this.state.showFilterMenu ? (
           <div
@@ -275,7 +302,6 @@ class App extends React.Component {
             <button
               style={{
                 height: "2.5vh",
-                // margin: "auto",
                 marginRight: "1vw",
                 borderRadius: "5px",
                 width: "5vw"
@@ -287,7 +313,6 @@ class App extends React.Component {
             <button
               style={{
                 height: "2.5vh",
-                // margin: "auto",
                 marginRight: "1vw",
                 borderRadius: "5px",
                 width: "5vw"
@@ -303,7 +328,6 @@ class App extends React.Component {
             <button
               style={{
                 height: "2.5vh",
-                // margin: "auto",
                 marginRight: "1vw",
                 borderRadius: "5px",
                 width: "5vw"
@@ -319,7 +343,6 @@ class App extends React.Component {
             <button
               style={{
                 height: "2.5vh",
-                // margin: "auto",
                 marginRight: "1vw",
                 borderRadius: "5px",
                 width: "5vw"
@@ -337,43 +360,6 @@ class App extends React.Component {
           downloadFile={this.downloadFile}
           getRoot={this.getRoot}
         />
-        {/* <Dropzone
-          onDrop={acceptedFiles => {
-            const file = acceptedFiles[0];
-            const fileName = acceptedFiles[0].name;
-            const form = new FormData();
-            form.append("file_ref", file);
-            form.append("file_name", fileName);
-            form.append("file_location", this.state.path);
-            axios
-              .put("http://0.0.0.0:8000/files/local/list/", form)
-              .then(response => {
-                console.log(response);
-              })
-              .catch(error => {
-                console.log(error);
-              });
-          }}
-        >
-          {({ getRootProps, getInputProps }) => (
-            <section
-              style={{
-                display: "block",
-                margin: "auto",
-                marginTop: "2.5vh",
-                width: "50%",
-                height: "5vh",
-                border: "1px dotted black",
-                backgroundColor: "lightGray"
-              }}
-            >
-              <div {...getRootProps()}>
-                <input {...getInputProps()} />
-                <p>Drag 'n' drop some files here, or click to select files</p>
-              </div>
-            </section>
-          )}
-        </Dropzone> */}
       </div>
     );
   }

@@ -60,9 +60,9 @@ const BreadcrumbTray = props => (
         form.append("file_name", fileName);
         form.append("file_location", props.path);
         axios
-          .put("http://0.0.0.0:8000/files/local/list/", form)
+          .put("http://localhost:8000/files/local/list/", form)
           .then(response => {
-            console.log(response);
+            props.refreshStateAfterUpload(response);
           })
           .catch(error => {
             console.log(error);
@@ -72,13 +72,6 @@ const BreadcrumbTray = props => (
       {({ getRootProps, getInputProps }) => (
         <button
           style={{
-            // display: "block",
-            // margin: "auto",
-            // marginTop: "20px",
-            // width: "50%",
-            // height: "5vh",
-            // border: "1px dotted black",
-            // backgroundColor: "lightGray"
             height: "2.5vh",
             margin: "auto",
             marginRight: "1vw",
@@ -87,10 +80,8 @@ const BreadcrumbTray = props => (
           }}
           {...getRootProps()}
         >
-          {/* <div  tyle={{ height: "100%", width: "100%" }}{...getRootProps()}> */}
           <input {...getInputProps()} />
           <p>Upload</p>
-          {/* </div> */}
         </button>
       )}
     </Dropzone>

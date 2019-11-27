@@ -2,7 +2,6 @@ import React from "react";
 import Item from "./Item.js";
 
 const FileBrowser = props => {
-  console.log(props);
   return (
     <div
       style={{
@@ -28,7 +27,6 @@ const FileBrowser = props => {
         : null}
       {props.files.length
         ? props.files.map(item => {
-            console.log(item);
             return (
               <Item
                 key={Math.random()}
