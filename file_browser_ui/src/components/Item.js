@@ -17,9 +17,9 @@ const Item = props => (
     }
   >
     {props.type === "directory" ? (
-      <SvgFolderIconYellow width="40px" height="40px" />
+      <SvgFolderIconYellow width="5vw" height="5vh" />
     ) : props.type === "file" ? (
-      <SvgFileIcon width="30px" height="30px" />
+      <SvgFileIcon width="4vw" height="4vh" />
     ) : null}
     <div>{props.name}</div>
   </div>
