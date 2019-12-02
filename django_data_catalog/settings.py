@@ -38,6 +38,8 @@ solr_host_ip = '192.168.190.133'
 solr_port = 8983
 solr_path = 'data-catalog'
 
+HADOOP_COMMAND_LOCATION = "/Users/asharma/apps/hadoop-3.1.2/bin/hdfs"
+
 # Application definition
 
 INSTALLED_APPS = [

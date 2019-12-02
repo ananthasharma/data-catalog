@@ -1,147 +1,56 @@
-import pyarrow as pa
-import pyarrow.parquet as pq
-import json
-from pathlib import Path
 from core.CustomLogger import CustomLogger
+import os
+from django.conf import settings
 
 
-class MaprFSBrowser:
-    log = CustomLogger().logger
-    fsm = [
-        {"root": "/LAN34", "actual_path": "/edl/auto"},
-        {"root": "/LAN33", "actual_path": "/edl/cards"}
-    ]
+class HDFSCommandLineFileBrowser:
+    log = CustomLogger.logger
 
-    def list_files(self, root_dir, mapr_user=None, mapr_password=None, host="localhost"):
-        """list all folders and files in 'root_dir' folder"""
-        self.log.debug(f"listing contents of folder {root_dir}")
-        data = []
-        current_dir = root_dir
-        fs = None
+    def listFiles(self, folder_path: str) -> [str]:
+        """Lists files using a shell command
+        approach::
+        use hdfs dfs -ls <<folder path>> command to list all folders and files; call this output
+        use hdfs dfs -ls -C <<folder path>> command to list only file or folder names; call this output_names
+        **** it is assumed that nothing changed in the folders between these two commands running ****
+        split each entry in output by line; remove matching names from output_names (as they are in the same order);
+        figure out of the entry is a file or folder by checking if entries in output starts with "d"
+        prepare response
+        """
+        self.log.debug(f"service invoked for folder :{folder_path}")
 
-        if current_dir.strip() == '/':
-            CustomLogger.logger.debug(
-                f"root folder ({current_dir}) chosen to list files under, returning pre-set root list (LAN numbers)")
-            for entry in self.fsm:
-                data.append({'name': entry['root'], 'children': []})
-            json_str = json.dumps(data)
-            self.log.debug(f"returning {json_str} for request to list {current_dir}")
-            return data
+        hdp_command = f"{settings.HADOOP_COMMAND_LOCATION} dfs -ls {folder_path}"
+        hdp_names_only_command = f"{settings.HADOOP_COMMAND_LOCATION} dfs -ls -C {folder_path}"
+        self.log.info(f"running command '{hdp_command}'")
+        output = os.popen(hdp_command).read()
+        # self.log.debug(f"\n\n\n\n {hdp_command} \n got response {output}")
+        self.log.info(f"running command '{hdp_names_only_command}'")
+        output_names = os.popen(hdp_names_only_command).read()
+        # self.log.debug(f"\n\n\n\n {hdp_names_only_command} \n got response {output_names}")
 
-        # by now, we must have the folder name, we need to decode the LAN34 and stuff into its real representation
-        # using the fsm dictionary
-        current_dir = self.decode(current_dir)
+        response = []
+        # this only lists the file and folder names.. we can continue
+        names_as_array = output_names.splitlines()
 
-        try:
-            fs = self.connect(host, mapr_user)
-            if not fs.exists(current_dir):
-                self.log.debug("File doesn't exist")
-                return data
-            data = self.list_content_in_folder(fs, current_dir, mapr_user, mapr_password, host)
-            self.log.debug(f"got data {json.dumps(data)}")
-        except Exception:
-            self.log.debug("unable to connect to host")
-            raise
+        # the first line is always the count of entries, we need to ignore it
+        listings_as_array = output.splitlines()[1:]
+        for idx, entry in enumerate(listings_as_array):
+            abs_path = names_as_array[idx]
+            file_name = abs_path.split("/").pop()
+            if str(entry).startswith("d"):
+                # then names_as_array[idx] is a folder
+                response.append(
+                    {"type": "directory", "name": names_as_array[idx], "simple_name": file_name, "contents": []})
+            else:
+                # extract the last elem
+                # "['drwx------   - asharma staff         64 2019-12-01 20:54 .Trash']"
+                # when we replace "<blank space> file name" with blank we get
+                # "['drwx------   - asharma staff         64 2019-12-01 20:54']"
+                # we need to split this into an array separated by space, then we get
+                # ['drwx------', '', '', '-', 'asharma', 'staff', '', '', '', '', '', '', '', '', '64', '2019-12-01', '20:54']
+                # pop(-3) will pop the last 3rd element from the array
+                # which is the size in bytes
+                t1 = str(entry).lower().replace(" " + abs_path.lower(), "").split(" ")
+                size = int(str(entry).lower().replace(" " + abs_path.lower(), "").split(" ").pop(-3))
+                response.append({"type": "file", "name": abs_path, "simple_name": file_name, "file_size": size})
 
-        return data
-
-    # ==================
-
-    def list_content_in_folder(self, fs, folder, mapr_user, mapr_password, host):
-        """lists contents of a folder """
-        files = []
-        for entry_in_current_dir in fs.ls(folder):
-            if len(entry_in_current_dir.strip()) > 0:
-                path = Path(entry_in_current_dir)
-                if not fs.isdir(entry_in_current_dir):
-                    self.log.debug(f"found file {entry_in_current_dir}")
-                    info = fs.info(f"{path}")
-                    encoded_file_path = self.encode(entry_in_current_dir)
-                    files.append({'name': f'{encoded_file_path}',
-                                  'last_modified': info['last_modified'],
-                                  'last_accessed': info['last_accessed'],
-                                  'size': info['size'],
-                                  'schema': self.get_file_info(entry_in_current_dir, mapr_user, mapr_password, host)
-                                  })
-                else:
-                    files.append(self.encode(entry_in_current_dir) + "/")
-        #                list_files(fs, entry_in_current_dir)
-        return files
-
-    # ==================
-
-    def decode(self, path):
-        if not path:
-            return None
-
-        for entry in self.fsm:
-            root = entry['root']
-            actual = entry['actual_path']
-            pos = path.find(root)
-            self.log.debug(f"checking {path} against {root}; found {pos}")
-            if pos >= 0:
-                # if the path begins with a specific /LANxx name, then we can replace it with its real value for
-                # internal use
-                self.log.debug(f"decoded {path} from {root} to {actual}")
-                path = path.replace(root, actual)
-                return path
-        self.log.debug(f"No matches found for {path} in the dictionary")
-        return path
-
-    # ==================
-
-    def encode(self, path):
-        if not path:
-            return None
-
-        for entry in self.fsm:
-            root = entry['root']
-            actual = entry['actual_path']
-            pos = path.find(actual)
-            self.log.debug(f"checking {path} against {actual}; found {pos}")
-            if pos >= 0:
-                # if the path begins with a specific /LANxx name, then we can replace it with its real value for
-                # internal use
-                self.log.debug(f"encoded {path} from {actual} to {root}")
-                path = path.replace(actual, root)
-                return path
-        self.log.debug(f"No matches found for {path} in the dictionary")
-        return path
-
-    # ==================
-
-    def get_file_info(self, file_name, mapr_user=None, mapr_password=None, host="localhost"):
-        """details file info for a given file, this call requires the full path of the file"""
-        fs = None
-        result = []
-
-        file_name = self.decode(file_name)
-        self.log.debug(f"Looking to get details for file {file_name}")
-        if not file_name.endswith('parquet'):
-            self.log.debug("not a parquet file, cannot work with this for now")
-            raise Exception(f"can only work with parquet file, this {file_name} is not a parquet file")
-
-        try:
-            self.log.debug("connecting to MapR-FS")
-            fs = self.connect(host, mapr_user)
-        except Exception:
-            self.log.debug("unable to connect to host")
-            raise
-        if not fs.exists(file_name):
-            self.log.debug("file not found")
-            raise Exception(f"File {file_name} not found")
-
-        if not fs.isdir(f"{file_name}"):
-            # ideally this condition should not fail
-            with fs.open(file_name) as file:
-                schema = pq.read_schema(file)
-                names = schema.names
-                for name in names:
-                    result.append({name: str(schema.field_by_name(name).type)})
-        return result
-
-    def connect(self, host, user):
-        # configure_server(host,user)
-        self.log.debug(f"connect: trying to connect to [{user}@{host}]")
-        fs = pa.hdfs.connect(host=host, user=user)
-        return fs
+        return response

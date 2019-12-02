@@ -4,33 +4,11 @@ from rest_framework.views import APIView
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.request import Request
-from .hdfs_file_browser import MaprFSBrowser
 from core.CustomLogger import CustomLogger
 from .local_file_browser import LocalFSBrowser
+from .hdfs_file_browser import HDFSCommandLineFileBrowser
 from .forms import StorageFileForm
 from django.conf import settings
-
-browser = MaprFSBrowser()
-
-
-class LocalFileFromCommandLine(APIView):
-    log = CustomLogger().logger
-
-    def get(self, request: Request):
-        """ Prints files/folders from local disk """
-        user = request.user
-        default_folder: str = settings.BASE_FOLDER_FOR_FILE_BROWSER
-        if not default_folder.endswith("/"):
-            default_folder = default_folder + "/"
-        folder: str = request.GET.get("folder", default_folder)
-        if not folder.lower().startswith(default_folder.lower()):
-            # this is a sub directory
-            folder = default_folder + folder
-
-        self.log.debug(f"printing files/folders from root {folder}; base_folder : {default_folder}")
-        fs_browser = LocalFSBrowser()
-        content = fs_browser.list_using_tree(folder)
-        return Response(data=content)
 
 
 class LocalFileFromService(APIView):
@@ -132,36 +110,17 @@ class LocalFilesystemContentDownloadView(APIView):
 
 class ListHDFSFiles(APIView):
     log = CustomLogger().logger
+    file_browser = HDFSCommandLineFileBrowser()
 
-    def get(self, request, mapr_user="mapr", mapr_password=None):
-        #        host = request.GET.__getitem__("host")
-        folder = request.GET.get("folder", '/')
-        host = request.GET.get("host", 'localhost')
-        mapr_password = None  # don't want to use the unhashed password, so ignoring the implementation for now
+    def get(self, request):
+        folder = request.GET.get("folder_path", '/')
+        self.log.info(f"got request to list contents of {folder}")
         content = {}
         try:
-            content = browser.list_files(folder, mapr_user, mapr_password, host)
+            content = self.file_browser.listFiles(folder)
+            self.log.info(f"success; returning {len(content)} items as dir listing of {folder}")
         except Exception:
-            self.log.debug(f"Found exception while listing files from folder {folder}")
+            self.log.debug(f"Found exception while listing contents of {folder}")
             raise
         return Response(content)
 
-
-class GetHDFSFileInfo(APIView):
-    log = CustomLogger().logger
-
-    def get(self, request, mapr_user="mapr", mapr_password=None):
-        file_name = request.GET.get("file_name", None)
-        host = request.GET.get("host", 'localhost')
-        mapr_password = None  # dont want to use the unhashed password, so ignoring the implementation for now
-        content = {}
-        if not file_name:
-            content = {"error": "please pass 'file_name' parameter in the URL to proceed"}
-        else:
-            try:
-                content = browser.get_file_info(file_name, mapr_user, mapr_password, host)
-            except Exception:
-                self.log.debug(f"Found exception while getting file info for file {file_name}")
-                content = {"error": f"File '{file_name}' not found"}
-
-        return Response(content)

@@ -20,8 +20,7 @@ from file_browser import views as file_browser_views
 urlpatterns = [
     path('admin/', admin.site.urls),
     path("hdfs/browse/", file_browser_views.ListHDFSFiles.as_view()),
-    path("hdfs/file_info/", file_browser_views.GetHDFSFileInfo.as_view()),
-    path("local/list/", file_browser_views.LocalFileFromService.as_view()),
+    path("local/browse/", file_browser_views.LocalFileFromService.as_view()),
     path("local/download/", file_browser_views.LocalFilesystemContentDownloadView.as_view()),
 ]
 

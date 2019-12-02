@@ -1,30 +1,15 @@
 import os
 import json
 from os import path
+from pathlib import Path
 from core.CustomLogger import CustomLogger
 
 
 class LocalFSBrowser:
     log = CustomLogger.logger
 
-    def list_using_tree(self, folder_path):
-        """ list folders and files using the tree command
-        tree -J --dirsfirst -L 1 <<folder_path>>
-         """
+    def list_folders(self, folder_path: str):
         self.log.debug(f"Listing contents of local folder :{folder_path}")
-
-        str_shell_command = f"tree -J --dirsfirst -L 1 {folder_path}"
-
-        self.log.debug(f"running command {str_shell_command}")
-
-        stream = os.popen(str_shell_command)
-        output = stream.read()
-        self.log.debug(f"json of size : {len(output)} will be returned.")
-        output_json = json.loads(s=output, encoding="utf-8")
-        return output_json
-
-    def list_folders(self, folder_path, depth=1):
-        #       self.log.debug(f"Listing contents of local folder :{folder_path}")
         output = []
         folders = []
         files = []
@@ -46,16 +31,14 @@ class LocalFSBrowser:
                 folders.append({"type": "directory", "name": entry, "contents": []})
             if path.isfile(entry):
                 # this is a file
-                files.append({"type": "file", "name": entry})
-        depth = depth - 1  # decrement, because we've looked at 1 level already
-        for iterations in range(1, depth):
-            # iterate through folders until depth is zero.
-            # TODO: Implement this feature (at some point in the future)
-            pass
+                path_instance = Path(entry)
+                size = os.stat(entry).st_size
+                files.append({"type": "file", "name": entry, "simple_name": path_instance.name, "file_size": size})
 
         self.log.debug(f"found {len(folders)} folder and {len(files)} files")
         folders.append(files)
         output.append({"type": "directory", "name": folder_path, "contents": folders})
+
         return output
 
     def store_file(self, file, dir_name, file_name) -> bool:
@@ -103,7 +86,3 @@ class LocalFSBrowser:
             raise IOError(f"trouble writing to location {target_file_name}")
 
         return True
-
-    def remove_file(self, file_to_delete):
-        """Implement delete file feature"""
-        pass
