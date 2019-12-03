@@ -18,5 +18,5 @@ from django.urls import path, include
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path("files/", include("file_browser.urls")),
+    path("file_manager/", include("file_browser.urls")),
 ]
